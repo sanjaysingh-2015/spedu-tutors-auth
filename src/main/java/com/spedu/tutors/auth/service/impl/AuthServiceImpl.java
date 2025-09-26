@@ -44,10 +44,11 @@ public class AuthServiceImpl implements AuthService {
 
         Role role = roleRepository.findByCode(request.getRole())
                 .orElseThrow(() -> new ResourceNotFoundException("RegisterRequest", "Role", request.getRole()));
-        String codePrefix = request.getRole().substring(0,3);
         User user = User.builder()
                 .email(request.getEmail())
+                .fullName(request.getName())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .phone(request.getPhoneNo())
                 .role(role) // or default role
                 .status("ACTIVE")
                 .build();
