@@ -6,9 +6,9 @@
     <modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.spedu.tutors</groupId>
-    <artifactId>admin-api</artifactId>
+    <artifactId>auth-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>admin-api</name>
+    <name>auth-api</name>
     <packaging>jar</packaging>
 
     <properties>
