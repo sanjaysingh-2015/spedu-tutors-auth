@@ -21,8 +21,8 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
-    @Column(name = "full_name")
-    private String fullName;
+    @Column(name = "name")
+    private String name;
     @Column(name = "email")
     private String email;
     @Column(name = "password_hash")

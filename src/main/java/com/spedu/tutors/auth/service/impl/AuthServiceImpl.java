@@ -4,9 +4,7 @@ import com.spedu.tutors.auth.config.JwtService;
 import com.spedu.tutors.auth.dto.request.LoginRequest;
 import com.spedu.tutors.auth.dto.request.RegisterRequest;
 import com.spedu.tutors.auth.dto.response.AuthResponse;
-import com.spedu.tutors.auth.dto.response.MenuResponse;
 import com.spedu.tutors.auth.entity.*;
-import com.spedu.tutors.auth.enums.EnumStatus;
 import com.spedu.tutors.auth.exceptions.ResourceNotFoundException;
 import com.spedu.tutors.auth.repository.*;
 import com.spedu.tutors.auth.service.AuthService;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("RegisterRequest", "Role", request.getRole()));
         User user = User.builder()
                 .email(request.getEmail())
-                .fullName(request.getName())
+                .name(request.getName())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhoneNo())
                 .role(role) // or default role
