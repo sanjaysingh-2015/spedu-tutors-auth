@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(token, refreshToken, null);
+        return new AuthResponse(user.getName(), token, refreshToken, null);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(token, refreshToken, null);
+        return new AuthResponse(user.getName(), token, refreshToken, null);
     }
 
     @Override
@@ -81,6 +81,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new AuthResponse(
+                user.getName(),
                 jwtService.generateToken(user),
                 jwtService.generateRefreshToken(user),
                 null

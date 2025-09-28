@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
+    private String name;
     private String accessToken;
     private String refreshToken;
     private List<MenuResponse> menus;
