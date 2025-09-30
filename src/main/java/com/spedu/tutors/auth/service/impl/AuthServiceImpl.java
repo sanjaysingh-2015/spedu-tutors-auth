@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -33,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mi:ss");
     @Override
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -54,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(user.getName(), token, refreshToken, null);
+        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()) , token, refreshToken, null);
     }
 
     @Override
@@ -68,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(user.getName(), token, refreshToken, null);
+        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()), token, refreshToken, null);
     }
 
     @Override
@@ -82,13 +84,12 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new AuthResponse(
                 user.getName(),
+                user.getRole().getName(), dateFormat.format(new Date()),
                 jwtService.generateToken(user),
                 jwtService.generateRefreshToken(user),
                 null
         );
     }
-
-
 
     public void logout(String token) {
         Date expiration = jwtService.extractExpiration(token);

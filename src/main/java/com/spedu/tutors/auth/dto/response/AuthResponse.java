@@ -11,6 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class AuthResponse {
     private String name;
+    private String role;
+    private String loginAt;
     private String accessToken;
     private String refreshToken;
     private List<MenuResponse> menus;
