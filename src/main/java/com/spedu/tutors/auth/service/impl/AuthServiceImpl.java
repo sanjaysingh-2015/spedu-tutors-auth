@@ -44,12 +44,17 @@ public class AuthServiceImpl implements AuthService {
 
         Role role = roleRepository.findByCode(request.getRole())
                 .orElseThrow(() -> new ResourceNotFoundException("RegisterRequest", "Role", request.getRole()));
+        Boolean profileCompleted = Boolean.TRUE;
+        if(role.getCode().equalsIgnoreCase("TUTOR") || role.getCode().equalsIgnoreCase("STUDENT") ) {
+            profileCompleted = Boolean.FALSE;
+        }
         User user = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhoneNo())
                 .role(role) // or default role
+                .profileCompleted(profileCompleted)
                 .status("ACTIVE")
                 .build();
 
@@ -57,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()) , token, refreshToken, null);
+        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()) , token, refreshToken, user.getProfileCompleted(),null);
     }
 
     @Override
@@ -71,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()), token, refreshToken, null);
+        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()), token, refreshToken, user.getProfileCompleted(),null);
     }
 
     @Override
@@ -88,6 +93,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getRole().getName(), dateFormat.format(new Date()),
                 jwtService.generateToken(user),
                 jwtService.generateRefreshToken(user),
+                user.getProfileCompleted(),
                 null
         );
     }

@@ -30,7 +30,9 @@ public class User {
     @Column(name = "phone")
     private String phone;
     @Column(name = "profile_picture")
-    private String profilePicture;
+    private Boolean profilePicture;
+    @Column(name="profile_completed")
+    private Boolean profileCompleted;
     @Column(name = "status")
     private String status;
     @Column(nullable = false, updatable = false)

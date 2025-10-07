@@ -15,6 +15,7 @@ public class AuthResponse {
     private String loginAt;
     private String accessToken;
     private String refreshToken;
+    private Boolean profileCompleted;
     private List<MenuResponse> menus;
 }
 
