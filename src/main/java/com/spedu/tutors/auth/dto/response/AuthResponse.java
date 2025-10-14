@@ -16,6 +16,8 @@ public class AuthResponse {
     private String accessToken;
     private String refreshToken;
     private Boolean profileCompleted;
+    private String countryCode;
+    private String countryName;
     private List<MenuResponse> menus;
 }
 

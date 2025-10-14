@@ -1,5 +1,6 @@
 package com.spedu.tutors.auth.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,41 +10,27 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "student_onboarding_steps")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class StudentOnboardingStep {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "country_id")
-    private Country country;
+    @JoinColumn(name = "user_id")
+    private User user;
     @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
-    @Column(name = "name")
-    private String name;
-    @Column(name = "email")
-    private String email;
-    @Column(name = "password_hash")
-    private String passwordHash;
-    @Column(name = "phone")
-    private String phone;
-    @Column(name = "profile_picture")
-    private Boolean profilePicture;
-    @Column(name="profile_completed")
-    private Boolean profileCompleted;
+    @JoinColumn(name = "onboarding_step_id")
+    private OnboardingStep onboardingStep;
     @Column(name = "status")
     private String status;
     @Column(nullable = false, updatable = false)
     private Long createdBy;
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-
     private Long updatedBy;
     private LocalDateTime updatedAt;
 }

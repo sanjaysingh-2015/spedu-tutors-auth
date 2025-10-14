@@ -1,5 +1,6 @@
 package com.spedu.tutors.auth.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,33 +10,23 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "countries")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Country {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "country_id")
-    private Country country;
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @Column(name = "code")
+    private String code;
     @Column(name = "name")
     private String name;
-    @Column(name = "email")
-    private String email;
-    @Column(name = "password_hash")
-    private String passwordHash;
-    @Column(name = "phone")
-    private String phone;
-    @Column(name = "profile_picture")
-    private Boolean profilePicture;
-    @Column(name="profile_completed")
-    private Boolean profileCompleted;
+    @Column(name="currency_code")
+    private String currencyCode;
+    @Column(name="currency_name")
+    private String currencyName;
     @Column(name = "status")
     private String status;
     @Column(nullable = false, updatable = false)
@@ -46,4 +37,5 @@ public class User {
 
     private Long updatedBy;
     private LocalDateTime updatedAt;
+
 }

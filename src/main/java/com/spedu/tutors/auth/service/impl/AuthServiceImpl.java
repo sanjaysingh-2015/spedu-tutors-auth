@@ -16,11 +16,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,9 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final OnboardingStepRepository onboardingStepRepository;
+    private final StudentOnboardingStepRepository studentOnboardingStepRepository;
+    private final TutorOnboardingStepRepository tutorOnboardingStepRepository;
     private final PasswordEncoder passwordEncoder;
     private final CodeGenerationUtils codeUtils;
     private final JwtService jwtService;
@@ -58,11 +63,16 @@ public class AuthServiceImpl implements AuthService {
                 .status("ACTIVE")
                 .build();
 
-        userRepository.save(user);
+        User saved = userRepository.save(user);
 
-        String token = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()) , token, refreshToken, user.getProfileCompleted(),null);
+        addOnboardingSteps(saved);
+
+        String token = jwtService.generateToken(saved);
+        String refreshToken = jwtService.generateRefreshToken(saved);
+        return new AuthResponse(saved.getName(), saved.getRole().getName(), dateFormat.format(new Date()) , token, refreshToken, saved.getProfileCompleted(),
+                ObjectUtils.isEmpty(saved.getCountry())? "": saved.getCountry().getCode(),
+                ObjectUtils.isEmpty(saved.getCountry())? "": saved.getCountry().getName(),
+                null);
     }
 
     @Override
@@ -76,7 +86,9 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()), token, refreshToken, user.getProfileCompleted(),null);
+        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()), token, refreshToken, user.getProfileCompleted(),
+                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getCode(),
+                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getName(),null);
     }
 
     @Override
@@ -94,6 +106,8 @@ public class AuthServiceImpl implements AuthService {
                 jwtService.generateToken(user),
                 jwtService.generateRefreshToken(user),
                 user.getProfileCompleted(),
+                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getCode(),
+                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getName(),
                 null
         );
     }
@@ -113,5 +127,32 @@ public class AuthServiceImpl implements AuthService {
         return blacklistedTokenRepository.existsByToken(token);
     }
 
+    public void addOnboardingSteps(User user) {
+        String roleCode = user.getRole().getCode();
+        List<OnboardingStep> onboardingSteps = onboardingStepRepository.findAllByStatusAndOnboardingType("ACTIVE", roleCode);
+        if("STUDENT".equalsIgnoreCase(roleCode)) {
+            List<StudentOnboardingStep> studentSteps = onboardingSteps.stream()
+                    .map(step -> StudentOnboardingStep.builder()
+                            .user(user)
+                            .onboardingStep(step)
+                            .status("PENDING")
+                            .createdAt(LocalDateTime.now())
+                            .createdBy(user.getId())
+                            .build())
+                    .toList();
+            studentOnboardingStepRepository.saveAll(studentSteps);
+        } else if("TUTOR".equalsIgnoreCase(roleCode)) {
+            List<TutorOnboardingStep> studentSteps = onboardingSteps.stream()
+                    .map(step -> TutorOnboardingStep.builder()
+                            .user(user)
+                            .onboardingStep(step)
+                            .status("PENDING")
+                            .createdAt(LocalDateTime.now())
+                            .createdBy(user.getId())
+                            .build())
+                    .toList();
+            tutorOnboardingStepRepository.saveAll(studentSteps);
+        }
+    }
 }
 
