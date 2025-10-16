@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
+    private Long userId;
     private String name;
     private String role;
     private String loginAt;

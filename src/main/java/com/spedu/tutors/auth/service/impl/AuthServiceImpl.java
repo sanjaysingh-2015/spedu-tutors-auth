@@ -69,10 +69,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(saved);
         String refreshToken = jwtService.generateRefreshToken(saved);
-        return new AuthResponse(saved.getName(), saved.getRole().getName(), dateFormat.format(new Date()) , token, refreshToken, saved.getProfileCompleted(),
-                ObjectUtils.isEmpty(saved.getCountry())? "": saved.getCountry().getCode(),
-                ObjectUtils.isEmpty(saved.getCountry())? "": saved.getCountry().getName(),
-                null);
+        return getResponse(user);
     }
 
     @Override
@@ -86,9 +83,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new AuthResponse(user.getName(), user.getRole().getName(), dateFormat.format(new Date()), token, refreshToken, user.getProfileCompleted(),
-                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getCode(),
-                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getName(),null);
+        return getResponse(user);
     }
 
     @Override
@@ -100,16 +95,7 @@ public class AuthServiceImpl implements AuthService {
         String email = jwtService.extractUsername(refreshToken);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return new AuthResponse(
-                user.getName(),
-                user.getRole().getName(), dateFormat.format(new Date()),
-                jwtService.generateToken(user),
-                jwtService.generateRefreshToken(user),
-                user.getProfileCompleted(),
-                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getCode(),
-                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getName(),
-                null
-        );
+        return getResponse(user);
     }
 
     public void logout(String token) {
@@ -153,6 +139,20 @@ public class AuthServiceImpl implements AuthService {
                     .toList();
             tutorOnboardingStepRepository.saveAll(studentSteps);
         }
+    }
+
+    private AuthResponse getResponse(User user) {
+        return new AuthResponse(
+                user.getId(),
+                user.getName(),
+                user.getRole().getName(), dateFormat.format(new Date()),
+                jwtService.generateToken(user),
+                jwtService.generateRefreshToken(user),
+                user.getProfileCompleted(),
+                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getCode(),
+                ObjectUtils.isEmpty(user.getCountry())? "": user.getCountry().getName(),
+                null
+        );
     }
 }
 
