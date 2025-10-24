@@ -1,28 +1,17 @@
-# Stage 1: Build the application
-FROM maven:3.9.6-eclipse-temurin-17 AS builder
-
-# Set working directory inside the container
-WORKDIR /app
-
-# Copy pom.xml and download dependencies
+# Use a lightweight JDK runtime
+FROM eclipse-temurin:17-jdk-jammy as build
+WORKDIR /workspace
+COPY mvnw .
+COPY .mvn .mvn
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+COPY src src
+# build the jar
+RUN ./mvnw -DskipTests package
 
-# Copy source code and build the project
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-# Stage 2: Run the application
-FROM eclipse-temurin:17-jdk-alpine
-
-# Set working directory
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-
-# Copy the JAR from the builder stage
-COPY --from=builder /app/target/auth-service-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose port 8080 (default Spring Boot port)
+COPY --from=build /workspace/target/*.jar app.jar
+# set Java opts (tune memory limits later)
+ENV JAVA_TOOL_OPTIONS="-Xms256m -Xmx512m -Djava.security.egd=file:/dev/./urandom"
 EXPOSE 8080
-
-# Start the Spring Boot application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","/app/app.jar"]
